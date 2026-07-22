@@ -20,3 +20,7 @@
 - Redis
 - Spring Security
 - JWT
+## 后续计划
+
+- 完善自动化测试
+- 完善项目部署说明

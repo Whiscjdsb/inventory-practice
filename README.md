@@ -30,7 +30,7 @@
 - MySQL 8
 - Redis
 
-MySQL 中需要存在 `inventory` 数据库和项目所需的数据表，Redis 默认连接 `127.0.0.1:6379`。
+MySQL 8 启动后，执行 [sql/schema.sql](sql/schema.sql) 创建 `inventory` 数据库和所需数据表。Redis 默认连接 `127.0.0.1:6379`。
 
 ## 环境变量
 

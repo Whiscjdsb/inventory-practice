@@ -2,6 +2,7 @@ package com.example.inventorypractice.service;
 
 import com.example.inventorypractice.dto.LoginRequest;
 import com.example.inventorypractice.entity.SysUser;
+import com.example.inventorypractice.exception.BusinessException;
 import com.example.inventorypractice.mapper.SysUserMapper;
 import com.example.inventorypractice.security.JwtTokenProvider;
 import com.example.inventorypractice.vo.LoginVO;
@@ -13,8 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -63,4 +65,33 @@ class AuthServiceTest {
         assertEquals("Bearer", result.getTokenType());
         assertEquals(86400L, result.getExpiresInSeconds());
     }
+
+    @Test
+    void shouldThrowExceptionWhenPasswordIsWrong(){
+        LoginRequest request = new LoginRequest();
+
+        request.setUsername("backend_intern");
+        request.setPassword("wrong-password");
+
+        SysUser user = new SysUser();
+        user.setUsername("backend_intern");
+        user.setPassword("encoded-password");
+        user.setStatus(1);
+
+        when(sysUserMapper.selectOne(any()))
+                .thenReturn(user);
+
+        when(passwordEncoder.matches(
+                "wrong-password",
+                "encoded-password"
+        )).thenReturn(false);
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(request));
+
+        assertEquals(401, exception.getCode());
+        assertEquals("用户名或密码错误", exception.getMessage());
+
+        verify(jwtTokenProvider, never()).generateToken(any());
+    }
+
 }

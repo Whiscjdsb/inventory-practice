@@ -55,7 +55,7 @@ public class AuthService {
         }
         boolean passwordCorrect = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if (!passwordCorrect) {
-            throw new BusinessException(401, "用户密码错误");
+            throw new BusinessException(401, "用户名或密码错误");
         }if (user.getStatus() == 0){
             throw new BusinessException(403, "用户已禁用");
         }

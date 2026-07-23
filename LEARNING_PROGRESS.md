@@ -1,6 +1,6 @@
 # inventory-practice 学习进度
 
-更新时间：2026-07-21（JWT 登录认证主链路已完成）
+更新时间：2026-07-23（JWT 授权、Redis 缓存、Git/GitHub 与首轮算法练习已完成）
 
 ## 当前技术栈
 
@@ -15,6 +15,8 @@
 - Swagger / OpenAPI（springdoc）
 - Spring Security
 - JJWT 0.13.0
+- Spring Cache、Redis
+- Git、GitHub
 
 ## 已完成
 
@@ -112,6 +114,22 @@
 - 已通过正确密码和错误密码测试：正确登录返回 JWT，错误密码返回 401。
 - 已引入 Spring Security，理解 `OncePerRequestFilter`、`Authorization: Bearer`、`SecurityContextHolder` 和无状态认证流程。
 - 已完成 JWT 过滤器与安全规则：注册、登录、Swagger 公开，其他接口必须认证；商品 4 已验证“带 Token 返回 200、不带 Token 返回 401”。
+- 已完成受保护的 `/api/auth/me` 接口，能够从 Spring Security 的 `Authentication` 中取得当前登录用户名，并返回 `backend_intern`。
+- 已把 JWT 中的角色转换为 Spring Security 权限，理解认证解决“你是谁”，授权解决“你能做什么”。
+- 已测试普通认证和管理员权限，能够区分 401（未认证或 Token 无效）与 403（已经认证但权限不足）。
+- 已完成商品按 ID 查询的 Redis 缓存：第一次查询 MySQL 并写入 Redis，后续查询命中缓存，不再执行商品查询 SQL。
+- 已使用 `@Cacheable`、`@CacheEvict` 和 TTL；修改或删除商品后清除对应缓存，避免返回旧数据。
+- 已理解 `ProductVO` 实现 `Serializable` 是为了让对象能够被 Redis 序列化保存。
+- 已理解当前项目使用的是 Cache-Aside 模式，也能说明“先查缓存、未命中查数据库、回填缓存、写操作删除缓存”的完整流程。
+- 已纠正项目表述：当前完成了商品查询缓存和缓存失效，但没有真正实现缓存穿透方案，不能在简历中写“解决缓存穿透”。
+- 已完成 Git 本地仓库初始化、`.gitignore`、查看状态、暂存、提交、查看日志和分支切换等基础操作。
+- 已把默认分支整理为 `main`，关联并推送到 GitHub：`https://github.com/Whiscjdsb/inventory-practice`。
+- 已完成 `feature/git-practice` 功能分支练习：修改、提交、切回主分支、Fast-forward 合并、推送并删除分支。
+- 已整理 README、项目技术栈、核心功能和后续计划，并能理解工作区、暂存区、本地仓库和远程仓库的区别。
+- 已能用自己的话讲解项目：原子 SQL 防止超卖、事务保证库存与操作记录一致、JWT 保护接口、Redis 提高热点查询速度。
+- 已开始准备后端实习：确认简历基础信息与项目描述，当前策略是边学习边投递，优先积累线上面试经验。
+- 已开始 Java 算法练习：完成 HashSet 判断数组重复元素，理解集合去重、`add()` 返回值、增强 for 循环和平均 `O(n)` 复杂度。
+- 已完成两数之和暴力解法并在 `main` 中运行成功，理解双重循环、数组下标、`new int[]{i, j}`、`O(n²)` 时间复杂度和 `O(1)` 额外空间。
 
 ## 当前正在学习
 
@@ -126,14 +144,14 @@
 
 当前下一步（按优先级从高到低）：
 
-1. 完成受保护的 `/api/auth/me` 接口，从 Spring Security 的 `Authentication` 取得当前用户名。
-2. 把 JWT 中的 `role` 转换为 Spring Security 权限，理解认证（是谁）与授权（能做什么）的区别。
-3. 为注册和登录补少量核心单元测试，不堆重复边界测试。
-4. 学习 Redis 的高频用途，优先做商品查询缓存或登录相关的简单实战。
-5. 学习 Git 基础协作流程，整理项目 README、简历描述和项目讲解。
-6. 继续巩固 Java 基础与常见 Java/Spring Boot/MySQL 面试题。
+1. 使用 `HashMap<Integer, Integer>` 优化两数之和，理解“数值 → 下标”和 `need = target - nums[i]`，把时间复杂度从 `O(n²)` 降到平均 `O(n)`。
+2. 继续补 Java 实习高频基础：数组、String、List、Set、Map、异常和常见集合操作，并保持少量算法练习。
+3. 检查并补充注册、登录的少量核心单元测试，不堆重复边界测试。
+4. 学习 Linux 常用命令和项目启动、部署基础，完善 README 中的运行步骤。
+5. 根据真实后端实习 JD 调整简历关键词和项目讲解，边学习边投递，积累线上面试经验。
+6. Docker、消息队列等内容放到后续扩展阶段，暂不急于学习微服务源码和复杂分布式架构。
 
-## 当前真实掌握程度（2026-07-21）
+## 当前真实掌握程度（2026-07-23）
 
 - 能理解 `Controller → Service → Mapper → 数据库` 的基本调用方向。
 - 能在提示下完成基础 CRUD、条件查询和统一响应类型。
@@ -143,7 +161,11 @@
 - 已开始接触 `EXPLAIN`，能在讲解下认识 `type`、`key`、`rows` 和 `Extra`，尚未独立掌握索引设计。
 - 已在讲解下完成联合索引、事务、行锁和 B+Tree 学习，能理解核心用途，但仍需独立复述和再次实战巩固。
 - 已在讲解下完成注册、登录、JWT 生成与校验、过滤器和接口保护的完整链路。
-- 能说明 `Authorization: Bearer`、JWT 校验、`SecurityContext` 和 401 拦截的基本流程；Spring Security 固定 API 目前以理解和会修改模板为目标，不要求默写。
+- 能说明 `Authorization: Bearer`、JWT 校验、`SecurityContext`、角色权限、401 和 403 的基本流程；Spring Security 固定 API 目前以理解和会修改模板为目标，不要求默写。
+- 能说明 Redis Cache-Aside 查询和缓存删除流程，并通过控制台 SQL 日志判断是否命中缓存；注解参数和序列化配置仍允许查资料。
+- 已能独立完成 Git 的常用本地操作和一次功能分支合并，但发生冲突、回退提交和多人协作仍需后续练习。
+- 已能较完整地复述项目难点和解决方案，但表达中的技术名词仍需准确，例如“原子 SQL”而不是含义不明的词。
+- 已进入算法入门阶段，能够读懂并运行 HashSet 去重和暴力两数之和；HashMap 优化解法尚未完成。
 - 能从长日志最底层 `Caused by` 定位环境变量缺失和临时目录权限问题，但本地运行配置仍需继续熟悉。
 
 ## 后端实习导向

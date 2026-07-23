@@ -1,6 +1,6 @@
 # inventory-practice 错误复盘
 
-更新时间：2026-07-21
+更新时间：2026-07-23
 
 用途：记录实际编码和接口测试中出现过的错误。下次出现编译错误、接口结果异常或数据不符合预期时，先按本文件检查。
 
@@ -488,7 +488,81 @@ import static org.mockito.ArgumentMatchers.any;
 
 选择 IDEA 自动导入时必须确认包名，不要使用 `jdk.internal` 或类似内部包。
 
-## 五、当前阶段的防错清单
+## 五、Git、PowerShell 与跨平台命令错误
+
+### 27. 把 `.gitignore` 当成 PowerShell 命令执行
+
+出现过：
+
+```text
+.gitignore : 无法将“.gitignore”项识别为 cmdlet、函数、脚本文件或可运行程序的名称
+```
+
+原因：`.gitignore` 是文件名，不是终端命令。
+
+改正：在 IDEA 中使用 `New → File` 创建和编辑 `.gitignore`；在终端中执行的是 `git status`、`git add`、`git commit` 等 Git 命令。
+
+### 28. 把 Git 的 LF/CRLF 提示当成失败
+
+`git add .` 时出现过 `LF will be replaced by CRLF`。这是 Windows 与 Linux 换行符转换警告，不代表暂存失败。
+
+处理方式：继续用 `git status` 检查文件是否进入暂存区；只有出现 `fatal` 或 `error` 才需要进一步处理。
+
+### 29. GitHub 克隆时 TLS 握手失败
+
+出现过：
+
+```text
+schannel: failed to receive handshake, SSL/TLS connection failed
+```
+
+原因：当时代理或网络节点连接 GitHub 超时，不是仓库地址或 Git 命令语法错误。
+
+处理顺序：切换可用代理节点 → 浏览器确认 GitHub 可访问 → 重试；必要时用：
+
+```powershell
+git -c http.version=HTTP/1.1 clone 仓库地址
+```
+
+不要通过关闭 `sslVerify` 绕过证书校验。
+
+### 30. 在 Windows PowerShell 中复制 Linux/macOS 虚拟环境命令
+
+错误命令和现象：
+
+```text
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Windows 中 `.venv/bin/python` 不存在；同时 `python3` 可能只是 Microsoft Store 的应用执行别名，因此没有真正创建 `.venv`。
+
+正确做法：先进入包含 `requirements.txt` 的项目目录，再执行：
+
+```powershell
+py --version
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m playwright install chromium
+```
+
+每一步都可用 `Test-Path .\.venv` 或 `Get-ChildItem .\.venv` 检查结果，不要连续复制多条命令后才看报错。
+
+### 31. 在错误目录执行复制 Skill 的命令
+
+在 `Easy-Job-Tutor` 项目内部执行 `cp -R Easy-Job-Tutor ...`，会寻找一个并不存在的同名子目录；`mkdir -p` 也是从 Unix 文档复制来的写法，目录已存在时 PowerShell 会提示错误。
+
+改正：先确认当前目录和源路径，再使用 PowerShell 命令：
+
+```powershell
+Get-Location
+Test-Path .\Easy-Job-Tutor
+Copy-Item -Recurse .\Easy-Job-Tutor "$env:USERPROFILE\.codex\skills\easy-job-tutor"
+```
+
+原则：复制安装文档前先判断自己使用的是 Windows PowerShell 还是 Linux/macOS 终端，并确认当前工作目录。
+
+## 六、当前阶段的防错清单
 
 写完 Service 后检查：
 

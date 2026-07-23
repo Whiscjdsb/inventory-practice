@@ -1,0 +1,8 @@
+.git
+.idea
+.env
+*.iml
+*.log
+
+target/*
+!target/inventory-practice-0.0.1-SNAPSHOT.jar
